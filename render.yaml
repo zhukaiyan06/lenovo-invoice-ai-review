@@ -18,5 +18,3 @@ services:
         generateValue: true
       - key: OCR_PROVIDER
         value: local-mock
-      - key: BACKEND_PORT
-        value: 3000
