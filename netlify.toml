@@ -7,8 +7,9 @@
   NODE_VERSION = "20"
 
 # All /api requests are proxied to the Render backend
+# ⚠️ 部署后端后请将下方 URL 替换为你的 Render 服务地址
 [[redirects]]
   from = "/api/*"
-  to = "https://lenovo-invoice-backend.onrender.com/api/:splat"
+  to = "https://YOUR_RENDER_SERVICE.onrender.com/api/:splat"
   status = 200
   force = false

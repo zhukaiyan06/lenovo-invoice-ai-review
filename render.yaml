@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: lenovo-invoice-backend
+    env: node
+    buildCommand: npm install && npm run prisma:generate && npm run prisma:migrate && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATABASE_URL
+        value: file:./prisma/dev.db
+      - key: AUTH_TOKEN_SECRET
+        generateValue: true
+      - key: BACKEND_PORT
+        value: 3000
