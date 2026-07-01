@@ -12,3 +12,6 @@ backend/uploads/
 frontend/dist/
 playwright-report/
 test-results/
+
+# Local Netlify folder
+.netlify

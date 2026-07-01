@@ -225,7 +225,7 @@ interface MeResponse {
 const tokenKey = 'lenovo.invoice.authToken'
 
 const apiBaseUrl: string =
-  (typeof import.meta !== 'undefined' && (import.meta as Record<string, unknown>).env
+  (typeof import.meta !== 'undefined' && import.meta.env
     ? (import.meta.env as Record<string, string>)['VITE_API_BASE_URL']
     : undefined)
   || ''
