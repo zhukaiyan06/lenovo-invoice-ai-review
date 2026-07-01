@@ -224,6 +224,12 @@ interface MeResponse {
 
 const tokenKey = 'lenovo.invoice.authToken'
 
+const apiBaseUrl: string =
+  (typeof import.meta !== 'undefined' && (import.meta as Record<string, unknown>).env
+    ? (import.meta.env as Record<string, string>)['VITE_API_BASE_URL']
+    : undefined)
+  || ''
+
 export function getStoredToken() {
   return window.localStorage.getItem(tokenKey)
 }
@@ -248,7 +254,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers.set('Authorization', `Bearer ${token}`)
   }
 
-  const response = await fetch(path, {
+  const response = await fetch(`${apiBaseUrl}${path}`, {
     ...options,
     headers
   })
@@ -329,7 +335,7 @@ export const api = {
 
   async exportArchived(filters: ArchivedReportFilters) {
     const token = getStoredToken()
-    const response = await fetch(`/api/reports/archived/export${queryString(filters)}`, {
+    const response = await fetch(`${apiBaseUrl}/api/reports/archived/export${queryString(filters)}`, {
       headers: token
         ? {
             Authorization: `Bearer ${token}`
@@ -403,7 +409,7 @@ export const api = {
 
   async invoiceBlob(id: string) {
     const token = getStoredToken()
-    const response = await fetch(`/api/reports/${id}/invoice`, {
+    const response = await fetch(`${apiBaseUrl}/api/reports/${id}/invoice`, {
       headers: token
         ? {
             Authorization: `Bearer ${token}`
