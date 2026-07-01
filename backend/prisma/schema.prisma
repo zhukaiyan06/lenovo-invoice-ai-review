@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         String
+  orgName      String
+  region       String?
+  createdAt    DateTime @default(now())
+  reports      Report[]    @relation("ReportOwner")
+  reviewedReports Report[] @relation("ReportReviewer")
+  logs         ReportLog[]
+  exportLogs   ExportLog[]
+}
+
+model UploadedFile {
+  id           String   @id @default(cuid())
+  originalName String
+  mimeType     String
+  storagePath  String
+  size         Int
+  createdAt    DateTime @default(now())
+  reports      Report[]
+}
+
+model Report {
+  id            String        @id @default(cuid())
+  ownerUserId   String
+  invoiceFileId String?
+  status        String        @default("待 L2 确认")
+  aiLabel       String        @default("未打标")
+  anomalyCodes  String        @default("[]")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  submittedAt   DateTime?
+  reviewedAt    DateTime?
+  reviewerUserId String?
+  rejectionReason String?
+  owner         User          @relation("ReportOwner", fields: [ownerUserId], references: [id])
+  reviewer      User?         @relation("ReportReviewer", fields: [reviewerUserId], references: [id])
+  invoiceFile   UploadedFile? @relation(fields: [invoiceFileId], references: [id])
+  fields        ReportFields?
+  items         ReportItem[]
+  ocrResult     OcrResult?
+  logs          ReportLog[]
+
+  @@index([ownerUserId])
+  @@index([reviewerUserId])
+  @@index([status])
+}
+
+model ReportFields {
+  id                     String  @id @default(cuid())
+  reportId               String  @unique
+  invoiceNo              String?
+  invoiceDate            String?
+  shipmentDate           String?
+  buyerName              String?
+  buyerCreditCode        String?
+  sellerName             String?
+  sellerCreditCode       String?
+  province               String?
+  prefectureCity         String?
+  city                   String?
+  totalTaxIncludedAmount String?
+  totalAmount            String?
+  totalTaxAmount         String?
+  remarks                String?
+  report                 Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model ReportItem {
+  id                   String @id @default(cuid())
+  reportId             String
+  invoiceItemName      String?
+  invoiceSpecModel     String?
+  productSpecificModel String?
+  unit                 String?
+  purchaseQuantity     String?
+  lineAmount           String?
+  lineTaxAmount        String?
+  sortOrder            Int    @default(0)
+  report               Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+}
+
+model OcrResult {
+  id         String   @id @default(cuid())
+  reportId   String   @unique
+  status     String
+  confidence Float
+  rawJson    String
+  createdAt  DateTime @default(now())
+  report     Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model ReportLog {
+  id            String   @id @default(cuid())
+  reportId      String
+  operatorId    String
+  operationType String
+  fieldName     String?
+  beforeValue   String?
+  afterValue    String?
+  createdAt     DateTime @default(now())
+  report        Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  operator      User     @relation(fields: [operatorId], references: [id])
+
+  @@index([reportId])
+  @@index([operatorId])
+}
+
+model ExportLog {
+  id            String   @id @default(cuid())
+  operatorId    String
+  filtersJson   String
+  result        String
+  rowCount      Int
+  fileName      String?
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+  operator      User     @relation(fields: [operatorId], references: [id])
+
+  @@index([operatorId])
+}

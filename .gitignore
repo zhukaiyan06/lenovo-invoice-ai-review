@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+
+backend/.env
+backend/dev.db
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+backend/uploads/
+
+frontend/dist/
+playwright-report/
+test-results/
